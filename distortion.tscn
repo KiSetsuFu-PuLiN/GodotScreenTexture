@@ -1,0 +1,277 @@
+[gd_scene load_steps=25 format=3 uid="uid://dcv0s7fahgydj"]
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_pwuv6"]
+default_input_values = [0, Vector2(0, 0), 1, Vector2(0.5, 0.5)]
+op_type = 0
+operator = 1
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_6xeym"]
+default_input_values = [0, Vector2(0, 0), 1, Vector2(0, 0)]
+op_type = 0
+operator = 3
+
+[sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_7dxd2"]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_i8usv"]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeTexture3DParameter" id="VisualShaderNodeTexture3DParameter_m7lpb"]
+parameter_name = "Texture3DParameter"
+texture_type = 1
+color_default = 1
+texture_repeat = 1
+
+[sub_resource type="VisualShaderNodeTexture3D" id="VisualShaderNodeTexture3D_xencn"]
+output_port_for_preview = 0
+source = 1
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_xw4os"]
+expanded_output_ports = [0]
+input_name = "screen_uv"
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_sfqpt"]
+
+[sub_resource type="VisualShaderNodeTexture3D" id="VisualShaderNodeTexture3D_ytxra"]
+output_port_for_preview = 0
+source = 1
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_4asek"]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_usl2x"]
+default_input_values = [0, 0.0, 1, 0.5]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_6wh8b"]
+default_input_values = [0, 0.0, 1, 1.0]
+operator = 4
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_npd2h"]
+output_port_for_preview = 0
+expanded_output_ports = [0]
+source = 1
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_ppmav"]
+output_port_for_preview = 0
+input_name = "screen_uv"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_invlg"]
+default_input_values = [0, Vector2(0, 0), 1, Vector2(0, 0)]
+op_type = 0
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_1iiwp"]
+output_port_for_preview = 0
+default_input_values = [0, 1.0, 1, 0.0, 2, 0.0]
+op_type = 0
+
+[sub_resource type="VisualShader" id="VisualShader_s8cii"]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_never, cull_back, diffuse_lambert, specular_schlick_ggx, depth_prepass_alpha, unshaded;
+
+uniform sampler3D Texture3DParameter : source_color, hint_default_black, repeat_enable;
+uniform sampler2D screen_tex_frg_3 : hint_screen_texture;
+
+
+
+void fragment() {
+// Input:4
+	vec2 n_out4p0 = SCREEN_UV;
+
+
+// Input:16
+	vec2 n_out16p0 = SCREEN_UV;
+	float n_out16p1 = n_out16p0.r;
+	float n_out16p2 = n_out16p0.g;
+
+
+// Input:13
+	float n_out13p0 = TIME;
+
+
+// VectorCompose:17
+	vec3 n_out17p0 = vec3(n_out16p1, n_out16p2, n_out13p0);
+
+
+	vec4 n_out15p0;
+// Texture3D:15
+	n_out15p0 = texture(Texture3DParameter, n_out17p0);
+
+
+// FloatOp:20
+	float n_in20p1 = 0.50000;
+	float n_out20p0 = n_out13p0 + n_in20p1;
+
+
+// FloatOp:21
+	float n_in21p1 = 1.00000;
+	float n_out21p0 = mod(n_out20p0, n_in21p1);
+
+
+// VectorCompose:19
+	vec3 n_out19p0 = vec3(n_out16p1, n_out16p2, n_out21p0);
+
+
+	vec4 n_out18p0;
+// Texture3D:18
+	n_out18p0 = texture(Texture3DParameter, n_out19p0);
+
+
+// VectorCompose:9
+	vec2 n_out9p0 = vec2(n_out15p0.x, n_out18p0.x);
+
+
+// VectorOp:10
+	vec2 n_in10p1 = vec2(0.50000, 0.50000);
+	vec2 n_out10p0 = n_out9p0 - n_in10p1;
+
+
+// FloatConstant:12
+	float n_out12p0 = 10.000000;
+
+
+// VectorOp:11
+	vec2 n_out11p0 = n_out10p0 / vec2(n_out12p0);
+
+
+// VectorOp:6
+	vec2 n_out6p0 = n_out4p0 + n_out11p0;
+
+
+	vec4 n_out3p0;
+// Texture2D:3
+	n_out3p0 = texture(screen_tex_frg_3, n_out6p0);
+
+
+// Output:0
+	ALBEDO = vec3(n_out3p0.xyz);
+
+
+}
+"
+graph_offset = Vector2(83.2924, 58.9476)
+modes/depth_draw = 2
+flags/depth_prepass_alpha = true
+flags/unshaded = true
+nodes/fragment/0/position = Vector2(760, 160)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture_npd2h")
+nodes/fragment/3/position = Vector2(540, 160)
+nodes/fragment/4/node = SubResource("VisualShaderNodeInput_ppmav")
+nodes/fragment/4/position = Vector2(0, 160)
+nodes/fragment/6/node = SubResource("VisualShaderNodeVectorOp_invlg")
+nodes/fragment/6/position = Vector2(340, 160)
+nodes/fragment/9/node = SubResource("VisualShaderNodeVectorCompose_1iiwp")
+nodes/fragment/9/position = Vector2(-260, 420)
+nodes/fragment/10/node = SubResource("VisualShaderNodeVectorOp_pwuv6")
+nodes/fragment/10/position = Vector2(-80, 420)
+nodes/fragment/11/node = SubResource("VisualShaderNodeVectorOp_6xeym")
+nodes/fragment/11/position = Vector2(120, 420)
+nodes/fragment/12/node = SubResource("VisualShaderNodeFloatConstant_7dxd2")
+nodes/fragment/12/position = Vector2(-80, 600)
+nodes/fragment/13/node = SubResource("VisualShaderNodeInput_i8usv")
+nodes/fragment/13/position = Vector2(-1380, 580)
+nodes/fragment/14/node = SubResource("VisualShaderNodeTexture3DParameter_m7lpb")
+nodes/fragment/14/position = Vector2(-1420, 680)
+nodes/fragment/15/node = SubResource("VisualShaderNodeTexture3D_xencn")
+nodes/fragment/15/position = Vector2(-480, 420)
+nodes/fragment/16/node = SubResource("VisualShaderNodeInput_xw4os")
+nodes/fragment/16/position = Vector2(-1400, 420)
+nodes/fragment/17/node = SubResource("VisualShaderNodeVectorCompose_sfqpt")
+nodes/fragment/17/position = Vector2(-660, 420)
+nodes/fragment/18/node = SubResource("VisualShaderNodeTexture3D_ytxra")
+nodes/fragment/18/position = Vector2(-480, 1040)
+nodes/fragment/19/node = SubResource("VisualShaderNodeVectorCompose_4asek")
+nodes/fragment/19/position = Vector2(-660, 1040)
+nodes/fragment/20/node = SubResource("VisualShaderNodeFloatOp_usl2x")
+nodes/fragment/20/position = Vector2(-1040, 1040)
+nodes/fragment/21/node = SubResource("VisualShaderNodeFloatOp_6wh8b")
+nodes/fragment/21/position = Vector2(-860, 1040)
+nodes/fragment/connections = PackedInt32Array(4, 0, 6, 0, 6, 0, 3, 0, 9, 0, 10, 0, 12, 0, 11, 1, 10, 0, 11, 0, 14, 0, 15, 2, 16, 1, 17, 0, 16, 2, 17, 1, 17, 0, 15, 0, 13, 0, 17, 2, 19, 0, 18, 0, 16, 1, 19, 0, 16, 2, 19, 1, 13, 0, 20, 0, 20, 0, 21, 0, 21, 0, 19, 2, 14, 0, 18, 2, 18, 0, 9, 1, 15, 0, 9, 0, 3, 0, 0, 0, 11, 0, 6, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7q8tb"]
+noise_type = 0
+frequency = 0.0921
+fractal_type = 0
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_q4k3o"]
+width = 128
+depth = 16
+noise = SubResource("FastNoiseLite_7q8tb")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n1462"]
+render_priority = 0
+shader = SubResource("VisualShader_s8cii")
+shader_parameter/Texture3DParameter = SubResource("NoiseTexture3D_q4k3o")
+
+[sub_resource type="BoxMesh" id="BoxMesh_emd5b"]
+material = SubResource("ShaderMaterial_n1462")
+
+[sub_resource type="Shader" id="Shader_cfinw"]
+code = "
+
+shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+uniform float FloatParameter;
+
+
+
+void vertex() {
+// Input:6
+	float n_out8p2 = PROJECTION_MATRIX[2][3];
+
+
+// Compare:9
+	float n_in9p1 = 0.00000;
+	float n_in9p2 = 0.00500;
+	bool n_out9p0 = (abs(n_out8p2 - n_in9p1) < n_in9p2);
+
+// Input:2
+	vec3 n_out2p0 = VERTEX;
+
+
+// FloatParameter:5
+	float n_out5p0 = FloatParameter;
+
+
+// VectorCompose:4
+	float n_in4p1 = 0.00000;
+	float n_in4p2 = 0.00000;
+	vec3 n_out4p0 = vec3(n_out5p0, n_in4p1, n_in4p2);
+
+
+// VectorOp:3
+	vec3 n_out3p0 = n_out2p0 + n_out4p0;
+
+
+	vec3 n_out10p0;
+// Switch:10
+	n_out10p0 = mix(n_out3p0, n_out2p0, float(n_out9p0));
+
+
+// Output:0
+	VERTEX = n_out10p0;
+
+
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1qour"]
+render_priority = 0
+shader = SubResource("Shader_cfinw")
+shader_parameter/FloatParameter = -0.51
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ig6n7"]
+material = SubResource("ShaderMaterial_1qour")
+
+[node name="Node3D" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.174583, -0.0431837, 0.0980861)
+mesh = SubResource("BoxMesh_emd5b")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3568, -0.0431837, 0.63245)
+mesh = SubResource("BoxMesh_emd5b")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.458474, 0.0416999, -4.32502)
+mesh = SubResource("CylinderMesh_ig6n7")
